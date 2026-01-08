@@ -37,12 +37,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * simulated with the following process structure:
  * <pre>
  * parallelParent process
- *   └─> forkScript (implicit fork gateway)
+ *   └─> parallelFork
  *         ├─> Execution 1: callActivity → parallelChild process → serviceTask (send-event) -> childEnd
  *         ├─> Execution 2: callActivity → parallelChild process → serviceTask (send-event) -> childEnd
  *         └─> Execution 3: callActivity → parallelChild process → serviceTask (send-event) -> childEnd
  *         \|/
- *          └─> end (implicit join gateway)
+ *          └─> parallelJoin -> end
  * </pre>
  * Using this kind of parallel execution pattern and asynchronous send-event
  * service tasks, we're seeing a 40% - 50% failure rate in production where some
@@ -51,9 +51,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p/>
  * Other permutations that produced similar failure rates:
  * <ul>
- *     <li>Replacing the implicit fork and join with an explicit parallel gateway</li>
- *     <li>Removing the implicit join and having each execution terminate in its own end event</li>
- *     <li>Replacing the three callActivities with the serviceTasks like the one currently in the child process</li>
+ *     <li>Replacing the parallel gateways with implicit forks and joins</li>
+ *     <li>Removing the parallel join and having each execution terminate in its own end event</li>
+ *     <li>Replacing the three callActivities with the serviceTasks like the one currently in the child process, thus
+ *     eliminating the child's involvement.</li>
  * </ul>
  */
 @ExtendWith(FlowableSpringExtension.class)

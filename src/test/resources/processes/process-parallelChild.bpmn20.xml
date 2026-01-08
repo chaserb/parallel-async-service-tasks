@@ -9,6 +9,13 @@
 
     <!-- Single async send-event serviceTask (mimics the sendEmail pattern) -->
     <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true">
+<!-- Other things I tried after reading https://www.flowable.com/blog/engineering/true-parallel-service-task-execution-with-flowable -->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true" flowable:parallelInSameTransaction="true">-->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true" flowable:parallelInSameTransaction="true">-->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="false" flowable:parallelInSameTransaction="true">-->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:parallelInSameTransaction="true">-->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:parallelInSameTransaction="true">-->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event">-->
       <extensionElements>
         <flowable:channelKey>parallel-test-outbound</flowable:channelKey>
         <flowable:eventType>parallelRequest</flowable:eventType>
