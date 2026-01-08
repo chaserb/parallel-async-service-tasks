@@ -1,0 +1,19 @@
+{
+  "key": "parallelResponse",
+  "name": "parallelResponse.event",
+  "correlationParameters": [
+    {
+      "name": "executionId",
+      "type": "string"
+    }
+  ],
+  "payload": [
+    {
+      "name": "success",
+      "type": "boolean"
+    }
+  ],
+  "inboundChannelKeys": [
+    "parallel-test-inbound"
+  ]
+}

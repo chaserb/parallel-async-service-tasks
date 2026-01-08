@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="TestWorkflow">
+  <process id="parallelChild" name="Parallel Child Test" isExecutable="true">
+    <documentation>Child subprocess with single async send-event serviceTask (mimics sendEmail pattern)</documentation>
+
+    <startEvent id="childStart" name="Start"/>
+
+    <!-- Single async send-event serviceTask (mimics the sendEmail pattern) -->
+    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true">
+      <extensionElements>
+        <flowable:channelKey>parallel-test-outbound</flowable:channelKey>
+        <flowable:eventType>parallelRequest</flowable:eventType>
+        <flowable:triggerEventType>parallelResponse</flowable:triggerEventType>
+        <flowable:eventInParameter sourceExpression="${execution.getId()}" target="executionId" targetType="string"/>
+        <flowable:eventInParameter sourceExpression="${parentExecutionId}" target="parentExecutionId" targetType="string"/>
+        <flowable:eventInParameter sourceExpression="${pathName}" target="pathName" targetType="string"/>
+        <flowable:eventOutParameter source="success" sourceType="boolean" target="success"/>
+        <flowable:triggerEventCorrelationParameter name="executionId" value="${execution.getId()}"/>
+      </extensionElements>
+    </serviceTask>
+
+    <endEvent id="childEnd" name="End"/>
+
+    <sequenceFlow id="childFlow1" sourceRef="childStart" targetRef="childTask"/>
+    <sequenceFlow id="childFlow2" sourceRef="childTask" targetRef="childEnd"/>
+  </process>
+</definitions>

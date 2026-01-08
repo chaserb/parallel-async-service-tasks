@@ -1,0 +1,23 @@
+{
+  "key": "parallelTrigger",
+  "name": "parallelTrigger.event",
+  "correlationParameters": [
+    {
+      "name": "testId",
+      "type": "string"
+    }
+  ],
+  "payload": [
+    {
+      "name": "testId",
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "type": "integer"
+    }
+  ],
+  "inboundChannelKeys": [
+    "parallel-test-inbound"
+  ]
+}

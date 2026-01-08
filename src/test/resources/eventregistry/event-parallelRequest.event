@@ -1,0 +1,18 @@
+{
+  "key": "parallelRequest",
+  "name": "parallelRequest.event",
+  "correlationParameters": [],
+  "payload": [
+    {
+      "name": "pathName",
+      "type": "string"
+    },
+    {
+      "name": "executionId",
+      "type": "string"
+    }
+  ],
+  "outboundChannelKeys": [
+    "parallel-test-outbound"
+  ]
+}

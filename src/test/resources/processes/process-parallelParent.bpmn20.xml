@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="TestWorkflow">
+  <process id="parallelParent" name="Parallel Parent Test" isExecutable="true">
+    <documentation>
+        Parent process that calls child subprocess three times in parallel to test for race conditions.
+    </documentation>
+
+    <startEvent id="start" name="Start" isInterrupting="true">
+      <extensionElements>
+        <flowable:eventType>parallelTrigger</flowable:eventType>
+        <flowable:eventOutParameter source="testId" target="testId"/>
+        <flowable:eventOutParameter source="value" target="value"/>
+      </extensionElements>
+    </startEvent>
+
+    <scriptTask id="forkScript" name="Prepare Parallel Calls" scriptFormat="groovy" flowable:autoStoreVariables="false">
+      <script><![CDATA[
+        // Prepare variables for each parallel path
+        execution.setVariable('path1Name', 'path1')
+        execution.setVariable('path2Name', 'path2')
+        execution.setVariable('path3Name', 'path3')
+      ]]></script>
+    </scriptTask>
+
+    <!-- Path 1: Synchronous callActivity to child process -->
+    <callActivity id="callChild1" name="Call Child 1" calledElement="parallelChild" flowable:fallbackToDefaultTenant="true">
+      <extensionElements>
+        <flowable:in sourceExpression="${execution.getId()}" target="parentExecutionId"/>
+        <flowable:in sourceExpression="${path1Name}" target="pathName"/>
+        <flowable:out source="success" target="path1Success"/>
+      </extensionElements>
+    </callActivity>
+
+    <!-- Path 2: Synchronous callActivity to child process -->
+    <callActivity id="callChild2" name="Call Child 2" calledElement="parallelChild" flowable:fallbackToDefaultTenant="true">
+      <extensionElements>
+        <flowable:in sourceExpression="${execution.getId()}" target="parentExecutionId"/>
+        <flowable:in sourceExpression="${path2Name}" target="pathName"/>
+        <flowable:out source="success" target="path2Success"/>
+      </extensionElements>
+    </callActivity>
+
+    <!-- Path 3: Synchronous callActivity to child process -->
+    <callActivity id="callChild3" name="Call Child 3" calledElement="parallelChild" flowable:fallbackToDefaultTenant="true">
+      <extensionElements>
+        <flowable:in sourceExpression="${execution.getId()}" target="parentExecutionId"/>
+        <flowable:in sourceExpression="${path3Name}" target="pathName"/>
+        <flowable:out source="success" target="path3Success"/>
+      </extensionElements>
+    </callActivity>
+
+    <endEvent id="end" name="End"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="forkScript"/>
+    <sequenceFlow id="flow2" sourceRef="forkScript" targetRef="callChild1"/>
+    <sequenceFlow id="flow3" sourceRef="forkScript" targetRef="callChild2"/>
+    <sequenceFlow id="flow4" sourceRef="forkScript" targetRef="callChild3"/>
+    <sequenceFlow id="flow5" sourceRef="callChild1" targetRef="end"/>
+    <sequenceFlow id="flow6" sourceRef="callChild2" targetRef="end"/>
+    <sequenceFlow id="flow7" sourceRef="callChild3" targetRef="end"/>
+
+  </process>
+</definitions>
