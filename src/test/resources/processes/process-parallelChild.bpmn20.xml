@@ -10,6 +10,7 @@
     <!-- Single async send-event serviceTask (mimics the sendEmail pattern) -->
     <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true">
 <!-- Other things I tried after reading https://www.flowable.com/blog/engineering/true-parallel-service-task-execution-with-flowable -->
+<!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="false">-->
 <!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true" flowable:parallelInSameTransaction="true">-->
 <!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="true" flowable:parallelInSameTransaction="true">-->
 <!--    <serviceTask id="childTask" name="Send Event" flowable:type="send-event" flowable:triggerable="true" flowable:async="true" flowable:exclusive="false" flowable:parallelInSameTransaction="true">-->

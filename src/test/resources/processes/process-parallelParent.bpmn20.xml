@@ -26,6 +26,7 @@
 
     <!-- Parallel Gateway: Fork -->
     <parallelGateway id="parallelFork" name="Fork"/>
+<!-- Also tried   <parallelGateway id="parallelFork" name="Fork" flowable:async="true"/>-->
 
     <!-- Path 1: Synchronous callActivity to child process -->
     <callActivity id="callChild1" name="Call Child 1" calledElement="parallelChild" flowable:fallbackToDefaultTenant="true">
@@ -56,6 +57,7 @@
 
     <!-- Parallel Gateway: Join -->
     <parallelGateway id="parallelJoin" name="Join"/>
+<!-- Also tried   <parallelGateway id="parallelJoin" name="Join" flowable:async="true"/>-->
 
     <endEvent id="end" name="End"/>
 
