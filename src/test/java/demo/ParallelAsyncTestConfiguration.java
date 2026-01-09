@@ -57,8 +57,7 @@ public class ParallelAsyncTestConfiguration {
         config.setDataSource(dataSource);
         config.setTransactionManager(transactionManager);
         config.setDatabaseSchemaUpdate("drop-create");
-
-        // CRITICAL: Set to false to prevent zombie executions
+//        config.setEventRegistryStartProcessInstanceAsync(true);
         config.setEventRegistryStartProcessInstanceAsync(false);
 
         // Enable event registry - REQUIRED for EventRegistryStartProcessInstanceAsync to work
