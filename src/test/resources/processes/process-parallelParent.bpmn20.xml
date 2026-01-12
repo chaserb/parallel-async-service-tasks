@@ -15,7 +15,7 @@
       </extensionElements>
     </startEvent>
 
-    <scriptTask id="initScript" name="Prepare Parallel Calls" scriptFormat="groovy" flowable:autoStoreVariables="false">
+    <scriptTask id="forkScript" name="Prepare Parallel Calls" scriptFormat="groovy" flowable:autoStoreVariables="false">
       <script><![CDATA[
         // Prepare variables for each parallel path
         execution.setVariable('path1Name', 'path1')
@@ -23,10 +23,6 @@
         execution.setVariable('path3Name', 'path3')
       ]]></script>
     </scriptTask>
-
-    <!-- Parallel Gateway: Fork -->
-    <parallelGateway id="parallelFork" name="Fork"/>
-<!-- Also tried   <parallelGateway id="parallelFork" name="Fork" flowable:async="true"/>-->
 
     <!-- Path 1: Synchronous callActivity to child process -->
     <callActivity id="callChild1" name="Call Child 1" calledElement="parallelChild" flowable:fallbackToDefaultTenant="true">
@@ -55,21 +51,15 @@
       </extensionElements>
     </callActivity>
 
-    <!-- Parallel Gateway: Join -->
-    <parallelGateway id="parallelJoin" name="Join"/>
-<!-- Also tried   <parallelGateway id="parallelJoin" name="Join" flowable:async="true"/>-->
-
     <endEvent id="end" name="End"/>
 
-    <sequenceFlow id="flow1" sourceRef="start" targetRef="initScript"/>
-    <sequenceFlow id="flow2" sourceRef="initScript" targetRef="parallelFork"/>
-    <sequenceFlow id="flow3" sourceRef="parallelFork" targetRef="callChild1"/>
-    <sequenceFlow id="flow4" sourceRef="parallelFork" targetRef="callChild2"/>
-    <sequenceFlow id="flow5" sourceRef="parallelFork" targetRef="callChild3"/>
-    <sequenceFlow id="flow6" sourceRef="callChild1" targetRef="parallelJoin"/>
-    <sequenceFlow id="flow7" sourceRef="callChild2" targetRef="parallelJoin"/>
-    <sequenceFlow id="flow8" sourceRef="callChild3" targetRef="parallelJoin"/>
-    <sequenceFlow id="flow9" sourceRef="parallelJoin" targetRef="end"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="forkScript"/>
+    <sequenceFlow id="flow2" sourceRef="forkScript" targetRef="callChild1"/>
+    <sequenceFlow id="flow3" sourceRef="forkScript" targetRef="callChild2"/>
+    <sequenceFlow id="flow4" sourceRef="forkScript" targetRef="callChild3"/>
+    <sequenceFlow id="flow5" sourceRef="callChild1" targetRef="end"/>
+    <sequenceFlow id="flow6" sourceRef="callChild2" targetRef="end"/>
+    <sequenceFlow id="flow7" sourceRef="callChild3" targetRef="end"/>
 
   </process>
 </definitions>
