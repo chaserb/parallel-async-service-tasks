@@ -51,15 +51,19 @@
       </extensionElements>
     </callActivity>
 
+    <!-- Explicit parallel gateway for join to handle concurrent completions safely -->
+    <parallelGateway id="join" name="Join"/>
+
     <endEvent id="end" name="End"/>
 
     <sequenceFlow id="flow1" sourceRef="start" targetRef="forkScript"/>
     <sequenceFlow id="flow2" sourceRef="forkScript" targetRef="callChild1"/>
     <sequenceFlow id="flow3" sourceRef="forkScript" targetRef="callChild2"/>
     <sequenceFlow id="flow4" sourceRef="forkScript" targetRef="callChild3"/>
-    <sequenceFlow id="flow5" sourceRef="callChild1" targetRef="end"/>
-    <sequenceFlow id="flow6" sourceRef="callChild2" targetRef="end"/>
-    <sequenceFlow id="flow7" sourceRef="callChild3" targetRef="end"/>
+    <sequenceFlow id="flow5" sourceRef="callChild1" targetRef="join"/>
+    <sequenceFlow id="flow6" sourceRef="callChild2" targetRef="join"/>
+    <sequenceFlow id="flow7" sourceRef="callChild3" targetRef="join"/>
+    <sequenceFlow id="flow8" sourceRef="join" targetRef="end"/>
 
   </process>
 </definitions>
