@@ -23,6 +23,9 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import lombok.extern.slf4j.Slf4j;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+
 import javax.sql.DataSource;
 import java.util.Map;
 
@@ -57,10 +60,7 @@ public class ParallelAsyncTestConfiguration {
         config.setDataSource(dataSource);
         config.setTransactionManager(transactionManager);
         config.setDatabaseSchemaUpdate("drop-create");
-//        config.setEventRegistryStartProcessInstanceAsync(true);
         config.setEventRegistryStartProcessInstanceAsync(false);
-
-        // Enable event registry - REQUIRED for EventRegistryStartProcessInstanceAsync to work
         config.setDisableEventRegistry(false);
 
         return config;
@@ -128,17 +128,40 @@ public class ParallelAsyncTestConfiguration {
 
     /**
      * Simple test implementation of InboundEventChannelAdapter for triggering
-     * events without MassTransit message serialization complexity. Just uses
-     * simple JSON payloads. Also implements OutboundEventChannelAdapter to
-     * handle events sent by serviceTasks.
+     * events. Also implements OutboundEventChannelAdapter to handle events sent
+     * by serviceTasks.
+     * <p/>
+     * Includes retry logic for optimistic locking exceptions to simulate
+     * message broker redelivery behavior (e.g., RabbitMQ nack + requeue).
      */
+    @Slf4j
     public static class TestInboundChannel implements InboundEventChannelAdapter,
             OutboundEventChannelAdapter<String> {
+        private static final int MAX_RETRIES = 5;
+        private static final long RETRY_DELAY_MS = 50;
+
         private InboundChannelModel inboundChannelModel;
         private EventRegistry eventRegistry;
 
         public void eventReceived(final String eventPayload) {
-            eventRegistry.eventReceived(inboundChannelModel, eventPayload);
+            for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                try {
+                    eventRegistry.eventReceived(inboundChannelModel, eventPayload);
+                    return; // Success
+                } catch (FlowableOptimisticLockingException e) {
+                    if (attempt == MAX_RETRIES) {
+                        log.error("Failed to process event after {} attempts: {}", MAX_RETRIES, e.getMessage());
+                        throw e;
+                    }
+                    log.debug("Optimistic locking on attempt {}, retrying in {}ms...", attempt, RETRY_DELAY_MS);
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("Interrupted during retry delay", ie);
+                    }
+                }
+            }
         }
 
         @Override
